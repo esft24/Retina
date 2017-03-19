@@ -1,0 +1,38 @@
+#! /usr/local/bin/ruby
+
+require_relative 'Lexer.rb'
+require_relative 'Parser.rb'
+require_relative 'Ast_fill_table.rb'
+require_relative 'Ast_check_table.rb'
+require_relative 'BaseFunk.rb'
+
+def main
+	ARGV[0] =~ /\w+\.rtn/
+	if $&.nil?; puts "Extensión desconocida"; return; end
+	begin
+		input = File::read(ARGV[0])
+	rescue
+		puts "Archivo no encontrado"
+		return
+	end
+	lexer = Lexer.new(input)
+	parser = Parser.new
+	
+	lexer.capturador
+	
+	if lexer.enviarCaptura.nil? == false
+		ast = parser.parse(lexer.enviarCaptura)
+		if ast.nil? == false
+			ast.fill_table
+			if $lista_errores_sintacticos.size == 0
+				$tabla_de_tablas.print_symtab
+			else
+				$lista_errores_sintacticos.each do |s|
+					puts s
+				end
+			end
+		end
+	end
+end
+
+main
