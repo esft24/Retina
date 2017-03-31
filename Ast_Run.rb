@@ -31,7 +31,7 @@ class Bloque
 			@declaraciones.lista.each do |d|
 				if d.identoAsig.is_a?(AsignacionParser)
 					tp = d.tipo.nombre
-					d.identoAsig.run_inst(tabla, tp, true) if d.respond_to? :run_inst
+					d.identoAsig.run_inst(tabla, tp, true) if d.identoAsig.respond_to? :run_inst
 				end
 				
 				if d.identoAsig.is_a?(Identificador)
