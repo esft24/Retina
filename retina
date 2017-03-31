@@ -25,6 +25,7 @@ def main
 		if ast.nil? == false
 			ast.fill_table
 			if $lista_errores_sintacticos.size == 0
+				$tabla_de_tablas.print_symtab
 				ast.run_inst
 				$retina.toFile(ARGV[0][0..-5])
 			else

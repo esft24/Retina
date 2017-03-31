@@ -168,7 +168,7 @@ class Funcion
 		if @instruccionesfu.buscarRetorno == true
 			$lista_errores_sintacticos << "La función #{@ident.nombre} no puede tener una instrucción de retorno"
 		end
-		@instruccionesfu.fill_table(tabla)
+		@instruccionesfu.fill_table(tabla) if @instruccionesfu.respond_to? :fill_table
 	end
 end
 
@@ -184,7 +184,7 @@ class FuncionConTipo
 		if @instruccionesfu.buscarRetorno == false
 			$lista_errores_sintacticos << "La función #{@ident.nombre} debe tener una instrucción de retorno"
 		end
-		@instruccionesfu.fill_table(tabla)
+		@instruccionesfu.fill_table(tabla) if @instruccionesfu.respond_to? :fill_table
 	end
 end
 
@@ -207,7 +207,7 @@ class IterFor
 	def fill_table padre = $tabla_de_tablas
 		tabla = TablaSimbolos.new("Iteracion for", "For", padre)
 		tabla.insertar(@ident.token, "number")
-		@instruccion.fill_table(tabla)
+		@instruccion.fill_table(tabla) if @instruccion.respond_to? :fill_table
 	end
 end
 
@@ -215,6 +215,6 @@ class IterForBy
 	def fill_table padre = $tabla_de_tablas
 		tabla = TablaSimbolos.new("Iteracion for", "For", padre)
 		tabla.insertar(@ident.token, "number")
-		@instruccion.fill_table(tabla)
+		@instruccion.fill_table(tabla) if @instruccion.respond_to? :fill_table
 	end
 end

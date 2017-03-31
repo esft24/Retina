@@ -31,7 +31,7 @@ class Bloque
 			@declaraciones.lista.each do |d|
 				if d.identoAsig.is_a?(AsignacionParser)
 					tp = d.tipo.nombre
-					d.identoAsig.run_inst(tabla, tp, true)
+					d.identoAsig.run_inst(tabla, tp, true) if d.respond_to? :run_inst
 				end
 				
 				if d.identoAsig.is_a?(Identificador)
@@ -45,8 +45,10 @@ class Bloque
 				end
 			end
 		end
-		@instrucciones.lista.each do |i|
-			i.run_inst(tabla) if i.respond_to? :run_inst
+		if @instrucciones.respond_to? :lista
+			@instrucciones.lista.each do |i|
+				i.run_inst(tabla) if i.respond_to? :run_inst
+			end
 		end
 	end
 	
@@ -100,8 +102,10 @@ class CondIf
 	def run_inst padre
 		g = @guardia.encontrar_valor(padre)
 		if g
-			@instruccion.lista.each do |i|
-				i.run_inst(padre) if i.respond_to? :run_inst
+			if @instruccion.respond_to? :lista
+				@instruccion.lista.each do |i|
+					i.run_inst(padre) if i.respond_to? :run_inst
+				end
 			end
 		end
 	end
@@ -111,12 +115,16 @@ class CondIfElse
 	def run_inst padre
 		g = @guardia.encontrar_valor(padre)
 		if g
-			@instruccion.lista.each do |i|
-				i.run_inst(padre) if i.respond_to? :run_inst
+			if @instruccion.respond_to? :lista
+				@instruccion.lista.each do |i|
+					i.run_inst(padre) if i.respond_to? :run_inst
+				end
 			end
 		else
-			@instruccion2.lista.each do |i|
-				i.run_inst(padre)
+			if @instruccion2.respond_to? :lista
+				@instruccion2.lista.each do |i|
+					i.run_inst(padre) if i.respond_to? :run_inst
+				end
 			end
 		end
 	end
@@ -126,10 +134,12 @@ class IterWhile
 	def run_inst padre
 		g = @guardia.encontrar_valor(padre)
 		while g
-			@instruccion.lista.each do |i|
-				i.run_inst(padre) if i.respond_to? :run_inst
+			if @instruccion.respond_to? :lista
+				@instruccion.lista.each do |i|
+					i.run_inst(padre) if i.respond_to? :run_inst
+				end
 			end
-			g = @guardia.run_inst(padre)
+			g = @guardia.run_inst(padre) if @guardia.respond_to? :run_inst
 		end
 	end
 end
@@ -142,8 +152,10 @@ class IterFor
 		tabla.insertar(@ident.nombre, d, "number")
 		
 		while d <= h
-			@instruccion.lista.each do |i|
-				i.run_inst(tabla) if i.respond_to? :run_inst
+			if @instruccion1.respond_to? :lista
+				@instruccion.lista.each do |i|
+					i.run_inst(tabla) if i.respond_to? :run_inst
+				end
 			end
 			d += 1
 			tabla.encontrar_insertar(@ident.nombre, d, "number")
@@ -161,8 +173,10 @@ class IterForBy
 		tabla.insertar(@ident.nombre, d, "number")
 		
 		while d <= h
-			@instruccion.lista.each do |i|
-				i.run_inst(tabla) if i.respond_to? :run_inst
+			if @instruccion.respond_to? :lista
+				@instruccion.lista.each do |i|
+					i.run_inst(tabla) if i.respond_to? :run_inst
+				end
 			end
 			d += t
 			tabla.encontrar_insertar(@ident.nombre, d, "number")
@@ -175,8 +189,10 @@ class IterRepeat
 		v = @veces.encontrar_valor(padre).floor
 		count = 1
 		while count <= v
-			@instruccion.lista.each do |i|
-				i.run_inst(padre) if i.respond_to? :run_inst
+			if @instruccion2.respond_to? :lista
+				@instruccion.lista.each do |i|
+					i.run_inst(padre) if i.respond_to? :run_inst
+				end
 			end
 			count += 1
 		end

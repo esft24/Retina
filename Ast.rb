@@ -169,11 +169,12 @@ class IterWhile < AST
 end
 
 class IterFor < AST
-	def initialize i, d, h, ins
+	def initialize i, d, h, ins, line
 		@ident = i
 		@desde = d
 		@hasta = h
 		@instruccion = ins
+		@line = line
 	end
 	def print_ast indent = ""
 		puts "#{indent}Iterador For"
@@ -189,12 +190,13 @@ class IterFor < AST
 end
 
 class IterForBy < AST
-	def initialize i, d, h, pp, ins
+	def initialize i, d, h, pp, ins, line
 		@ident = i
 		@desde = d
 		@hasta = h
 		@por = pp
 		@instruccion = ins
+		@line = line
 	end
 	def print_ast indent = ""
 		puts "#{indent}Iterador For by"
@@ -212,8 +214,9 @@ class IterForBy < AST
 end
 
 class IterRepeat < AST
-	def initialize v, ins
+	def initialize v, ins, line
 		@veces = v
+		@line = line
 		@instruccion = ins
 	end
 	def print_ast indent = ""
