@@ -997,14 +997,22 @@ module_eval(<<'.,.,', 'Parser.y', 151)
 
 module_eval(<<'.,.,', 'Parser.y', 152)
   def _reduce_42(val, _values, result)
-    result = Salidas.new(val[1])
+	if val[0].text == 'write'
+		result = Salidas.new(val[1], false)
+	elsif val[0].text == 'writeln'
+		result = Salidas.new(val[1], true)
+	end
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'Parser.y', 153)
   def _reduce_43(val, _values, result)
-    result = SalidasConSalto.new(val[1])
+    if val[0].text == 'write'
+		result = Salidas.new(val[1], false)
+	elsif val[0].text == 'writeln'
+		result = Salidas.new(val[1], true)
+	end
     result
   end
 .,.,

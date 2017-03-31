@@ -2,8 +2,8 @@
 
 require_relative 'Lexer.rb'
 require_relative 'Parser.rb'
-require_relative 'Ast_fill_table.rb'
 require_relative 'Ast_check_table.rb'
+require_relative 'Ast_Run.rb'
 require_relative 'BaseFunk.rb'
 
 def main
@@ -25,11 +25,10 @@ def main
 		if ast.nil? == false
 			ast.fill_table
 			if $lista_errores_sintacticos.size == 0
-				$tabla_de_tablas.print_symtab
+				ast.run_inst
+				$retina.toFile(ARGV[0][0..-5])
 			else
-				$lista_errores_sintacticos.each do |s|
-					puts s
-				end
+				puts $lista_errores_sintacticos[0]
 			end
 		end
 	end

@@ -43,7 +43,7 @@ class Funcion < AST
 end
 
 class FuncionConTipo < AST
-	attr_accessor :ident, :argumentos, :instruccionesfu
+	attr_accessor :ident, :argumentos, :instruccionesfu, :tipo
 	def initialize i, a, t, ifu
 		@ident = i						#Identificador 
 		@argumentos = a			#Listas>Argumentos o []
@@ -108,15 +108,13 @@ class Funciones < Listas; end		#Funcion
 class Argumentos < Listas; end		#Argumento
 class Declaraciones < Listas; end	#Declaracion
 class Instrucciones < Listas; end	#Instruccion (*)
-class Salidas < Listas; end				#Expresion(*) o CadenaDeCaracteresParser
-class SalidasConSalto < Listas		#Expresion(*) o CadenaDeCaracteresParser
-	def print_ast indent = ""
-		puts "#{indent}Salidas con Salto"
-		@lista.each do |f|
-			f.print_ast indent + "      " if f.respond_to? :print_ast
-		end
+class Salidas < Listas
+	attr_accessor :lista, :salto
+	def initialize a, salto
+		@lista = a #Atributo es un arreglo de objetos AST
+		@salto = salto
 	end
-end
+end	
 ################################################################################################################
 
 ###############################################Instrucciones varias############################
@@ -238,7 +236,11 @@ end
 
 class Entrada < ExpresionUnaria;end
 
-class Retorno < ExpresionUnaria;end
+class Retorno < ExpresionUnaria
+	def run_inst padre
+		padre.encontrar_insertar($stack_funciones[-1].capitalize, @op.encontrar_valor(padre), "number")
+	end
+end
 
 class Minus < ExpresionUnaria
 	attr_accessor :op, :tipo, :checked, :linea

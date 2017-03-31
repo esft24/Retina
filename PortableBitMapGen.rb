@@ -90,6 +90,7 @@ class Turtle
 			end
 			@canvasmatrix << dummy
 		end
+		@canvasmatrix[500][500] = 1
 	end
 	
 	def diagonal_to_lines
@@ -232,13 +233,3 @@ class Turtle
 		end
 	end
 end
-
-tortuga = Turtle.new()
-tortuga.arc(360, 500)
-for i in 1..100
-	tortuga.forward(i*2)
-	tortuga.rotatel(90)
-end
-#puts tortuga.canvas
-#puts tortuga.canvasraw
-tortuga.toFile("example")

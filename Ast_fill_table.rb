@@ -6,6 +6,8 @@ $tabla_de_funciones = TablaSimbolos.new("Principal", "Funciones", $tabla_de_tabl
 $tabla_de_programa = TablaSimbolos.new("Principal", "Programa", $tabla_de_tablas)
 $Bloque_COunt = 0
 $lista_errores_sintacticos = []
+$calls_to_check = []
+$func_to_define = {}
 
 ######################################################################
 
@@ -52,6 +54,15 @@ end
 
 class Programa
 	def fill_table
+		if @funciones.respond_to? :lista
+			@funciones.lista.each do |f| 
+				if f.is_a?(FuncionConTipo)
+					$func_to_define[f.ident.nombre] = [f.tipo.nombre, f.argumentos]
+				else
+					$func_to_define[f.ident.nombre] = [nil, f.argumentos]
+				end
+			end
+		end
 		@funciones.fill_table($tabla_de_funciones) if @funciones.respond_to? :fill_table
 		@instrucciones.fill_table($tabla_de_programa) if @instrucciones.respond_to? :fill_table
 	end
@@ -151,7 +162,9 @@ class Funcion
 			$lista_errores_sintacticos << "Una función no puede ser declarada si tiene el mismo nombre de una declarada anteriormente (linea #{@ident.token.line})"
 		end
 		tabla = TablaSimbolos.new("Funcion", "#{@ident.nombre}", padre, nil, @argumentos)
-		@argumentos.conseguir_decl(tabla)
+		if @argumentos != []
+			@argumentos.conseguir_decl(tabla)
+		end
 		if @instruccionesfu.buscarRetorno == true
 			$lista_errores_sintacticos << "La función #{@ident.nombre} no puede tener una instrucción de retorno"
 		end
@@ -165,7 +178,9 @@ class FuncionConTipo
 			$lista_errores_sintacticos << "Una función no puede ser declarada si tiene el mismo nombre de una declarada anteriormente (linea #{@ident.token.line})"
 		end
 		tabla = TablaSimbolos.new("Funcion", "#{@ident.nombre}", padre, "#{@tipo.nombre}", @argumentos)
-		@argumentos.conseguir_decl(tabla)
+		if @argumentos != []
+			@argumentos.conseguir_decl(tabla)
+		end
 		if @instruccionesfu.buscarRetorno == false
 			$lista_errores_sintacticos << "La función #{@ident.nombre} debe tener una instrucción de retorno"
 		end

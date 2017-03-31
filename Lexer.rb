@@ -3,7 +3,7 @@ require_relative 'SegregateTks.rb'
 #Tabla de hash con las distintas expresiones regulares con las que verificaremos cada token
 $tokens = {
 	LiteralesNumericos: 		/\A[0-9]+\.[0-9]+|\A[0-9]+/,
-	PalabrasReservadas: 		/\Aread\b|\Awrite\b|\Awriteln\b|\Aif\b|\Athen\b|\Aend\b|\Awith\b|\Ado\b|\Aprogram\b|\Afor\b|\Afrom\b|\Ato\b|\Awhile\b|\Aby\b|\Arepeat\b|\Atimes\b|\Afunc\b|\Abegin\b|\Atrue\b|\Afalse\b|\Aelse\b|\Areturn\b/,
+	PalabrasReservadas: 		/\Aread\b|\Awriteln\b|\Awrite\b|\Aif\b|\Athen\b|\Aend\b|\Awith\b|\Ado\b|\Aprogram\b|\Afor\b|\Afrom\b|\Ato\b|\Awhile\b|\Aby\b|\Arepeat\b|\Atimes\b|\Afunc\b|\Abegin\b|\Atrue\b|\Afalse\b|\Aelse\b|\Areturn\b/,
 	CadenaDeCaracteres:			/\A"([^\\\n]?\\\\|[^\\\n]?\\n|[^\\\n]?\\"|[^\\\n])*?"/,
 	Signos: 					/\A\-\>|\A\/\=|\A\>\=|\A\<\=|\A\=\=|\A\+|\A\-|\A\*|\A\/|\A\=|\A\>|\A\<|\A\,|\A\;|\A\(|\A\)|\A\%|\Adiv\b|\Amod\b|\Aand\b|\Aor\b|\Anot\b/,
 	TipoDeDato: 				/\Anumber\b|\Aboolean\b/,

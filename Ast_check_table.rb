@@ -250,24 +250,58 @@ end
 
 class Llamada
 	def check_table padre
-		@argumentos.lista.each do |f|
-			f.check_table(padre) if f.respond_to? :check_table
+		if @argumentos != []
+			@argumentos.lista.each do |f|
+				f.check_table(padre) if f.respond_to? :check_table
+			end
 		end
 		
 		#chequear existencia de funcion
-		if !$tabla_de_funciones.hijo.has_key?(@ident.nombre)
+		if !$tabla_de_funciones.hijo.has_key?(@ident.nombre) && !$func_to_define.has_key?(@ident.nombre)
 			$lista_errores_sintacticos << "La función #{@ident.nombre} no existe (linea #{@ident.token.line})"
 			return
 		end
+		
+		if !$tabla_de_funciones.hijo.has_key?(@ident.nombre)
+			check_arg($func_to_define[@ident.nombre][1], padre)
+		else
+			check_arg($tabla_de_funciones.hijo[@ident.nombre].argumentos, padre)
+		end
+	end
+	
+	def check_arg args, padre
 		#chequear numero argumentos
-		if @argumentos.lista.size != $tabla_de_funciones.hijo[@ident.nombre].argumentos.lista.size
-			$lista_errores_sintacticos << "La función #{@ident.nombre} recibe #{@argumentos.lista.size} argumento(s) cuando requiere #{$tabla_de_funciones.hijo[@ident.nombre].argumentos.lista.size} (linea #{@ident.token.line})"
-			return
+		if @argumentos != []
+			if args != []
+				if @argumentos.lista.size != args.lista.size
+					$lista_errores_sintacticos << "La función #{@ident.nombre} recibe #{@argumentos.lista.size} argumento(s) cuando requiere #{args.lista.size} (linea #{@ident.token.line})"
+					return
+				end
+			else
+				if @argumentos.lista.size != 0
+					$lista_errores_sintacticos << "La función #{@ident.nombre} recibe #{@argumentos.lista.size} argumento(s) cuando requiere 0 (linea #{@ident.token.line})"
+					return
+				end
+			end
+		else
+			if args != []
+				if 0 != args.lista.size
+					$lista_errores_sintacticos << "La función #{@ident.nombre} recibe 0 argumento(s) cuando requiere #{args.lista.size} (linea #{@ident.token.line})"
+					return
+				end
+			end
 		end
 		#chequear tipo argumentos
-		listaparam = $tabla_de_funciones.hijo[@ident.nombre].argumentos.lista
-		
-		v = @argumentos.lista.size
+		if args != []
+			listaparam = args.lista
+		else
+			listaparam = []
+		end
+		if @argumentos != []
+			v = @argumentos.lista.size
+		else
+			v = 0
+		end
 		for i in (0..v - 1)
 			if @argumentos.lista[i].encontrar_tipo(padre) != listaparam[i].tipo.nombre
 				$lista_errores_sintacticos << "La función #{@ident.nombre} recibe argumentos de tipo incorrecto. Argumento #{i + 1} de tipo #{@argumentos.lista[i].encontrar_tipo(padre)} debe ser un #{listaparam[i].tipo.nombre}"
@@ -276,11 +310,24 @@ class Llamada
 	end
 	
 	def encontrar_tipo tabla
-		if !$tabla_de_funciones.hijo[@ident.nombre].retorno.nil?
-			return $tabla_de_funciones.hijo[@ident.nombre].retorno
+		if !$tabla_de_funciones.hijo.has_key?(@ident.nombre)
+			if !$func_to_define.has_key?(@ident.nombre)
+				$lista_errores_sintacticos << "La función #{@ident.nombre} no existe (linea #{@ident.token.line})"
+			else
+				if $func_to_define[@ident.nombre][0].nil?
+					$lista_errores_sintacticos << "Una función sin retorno no puede ser parte de una asignación o una instrucción de salida (linea #{@ident.token.line})"
+					return nil
+				else
+					return $func_to_define[@ident.nombre][0]
+				end
+			end
 		else
-			$lista_errores_sintacticos << "Una función sin retorno no puede ser parte de una asignación (linea #{@ident.token.line})"
-			return nil
+			if !$tabla_de_funciones.hijo[@ident.nombre].retorno.nil?
+				return $tabla_de_funciones.hijo[@ident.nombre].retorno
+			else
+				$lista_errores_sintacticos << "Una función sin retorno no puede ser parte de una asignación o una instrucción de salida (linea #{@ident.token.line})"
+				return nil
+			end
 		end
 	end
 end
@@ -290,7 +337,7 @@ end
 
 class Retorno
 	def check_table tabla
-		@op.check_table if @op.respond_to? :check_table
+		@op.check_table(tabla) if @op.respond_to? :check_table
 		
 		ret = tabla.retornoTipo
 		
@@ -373,7 +420,7 @@ class Salidas
 	def check_table tabla
 		@lista.each do |s|
 			s.check_table(tabla) if s.respond_to? :check_table
-			s.encontrar_tipo(tabla) if s.respond_to? :check_table
+			s.encontrar_tipo(tabla) if s.respond_to? :encontrar_tipo
 		end
 	end
 end
@@ -382,7 +429,7 @@ class SalidasConSalto
 	def check_table tabla
 		@lista.each do |s|
 			s.check_table(tabla) if s.respond_to? :check_table
-			s.encontrar_tipo(tabla) if s.respond_to? :check_table
+			s.encontrar_tipo(tabla) if s.respond_to? :encontrar_tipo
 		end
 	end
 end
