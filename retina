@@ -2,8 +2,8 @@
 
 require_relative 'Lexer.rb'
 require_relative 'Parser.rb'
-require_relative 'Ast_fill_table.rb'
 require_relative 'Ast_check_table.rb'
+require_relative 'Ast_Run.rb'
 require_relative 'BaseFunk.rb'
 
 def main
@@ -15,21 +15,21 @@ def main
 		puts "Archivo no encontrado"
 		return
 	end
-	lexer = Lexer.new(input)
-	parser = Parser.new
+	lexer = Lexer.new(input)						#Crea un objeto Lexer con el archivo de entrada
+	parser = Parser.new								#Crea un nuevo objeto Parser
 	
-	lexer.capturador
+	lexer.capturador								#Captura Tokens
 	
 	if lexer.enviarCaptura.nil? == false
-		ast = parser.parse(lexer.enviarCaptura)
+		ast = parser.parse(lexer.enviarCaptura)		#Parsea Captura
 		if ast.nil? == false
-			ast.fill_table
+			ast.fill_table							#Llenar Tabla Sintáctica
 			if $lista_errores_sintacticos.size == 0
-				$tabla_de_tablas.print_symtab
+				#$tabla_de_tablas.print_symtab		#Imprimir Tabla de Sintaxis, en caso de que se quiera
+				ast.run_inst						#Correr Retina
+				$retina.toFile(ARGV[0][0..-5])		#Crear Imagen
 			else
-				$lista_errores_sintacticos.each do |s|
-					puts s
-				end
+				puts $lista_errores_sintacticos[0]	#Imprimir Errores Sintacticos
 			end
 		end
 	end

@@ -1,0 +1,20 @@
+program
+if true then end;
+
+while false do end;
+
+with do end;
+
+if true then else end;
+
+with number x = 6; do for i from 4 to 3 do end; end;
+
+repeat 6 times end;
+
+for i from 4 to 3 by 2 do end;
+
+with do writeln "hello"; end;
+
+with number x = 6; do end;
+
+end;

@@ -1,0 +1,12 @@
+func max(number a, number b) -> number
+begin
+	if a > b then
+		return a;
+	else
+		return b;
+	end;
+end;
+
+program
+	writeln max(8,9);
+end;

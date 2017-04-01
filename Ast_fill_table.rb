@@ -6,9 +6,10 @@ $tabla_de_funciones = TablaSimbolos.new("Principal", "Funciones", $tabla_de_tabl
 $tabla_de_programa = TablaSimbolos.new("Principal", "Programa", $tabla_de_tablas)
 $Bloque_COunt = 0
 $lista_errores_sintacticos = []
+$calls_to_check = []
+$func_to_define = {}
 
 ######################################################################
-
 class AST
 	def fill_table padre = $tabla_de_tablas
 		attrs.each do |a|
@@ -52,6 +53,15 @@ end
 
 class Programa
 	def fill_table
+		if @funciones.respond_to? :lista
+			@funciones.lista.each do |f| 
+				if f.is_a?(FuncionConTipo)
+					$func_to_define[f.ident.nombre] = [f.tipo.nombre, f.argumentos]
+				else
+					$func_to_define[f.ident.nombre] = [nil, f.argumentos]
+				end
+			end
+		end
 		@funciones.fill_table($tabla_de_funciones) if @funciones.respond_to? :fill_table
 		@instrucciones.fill_table($tabla_de_programa) if @instrucciones.respond_to? :fill_table
 	end
@@ -151,11 +161,15 @@ class Funcion
 			$lista_errores_sintacticos << "Una función no puede ser declarada si tiene el mismo nombre de una declarada anteriormente (linea #{@ident.token.line})"
 		end
 		tabla = TablaSimbolos.new("Funcion", "#{@ident.nombre}", padre, nil, @argumentos)
-		@argumentos.conseguir_decl(tabla)
-		if @instruccionesfu.buscarRetorno == true
-			$lista_errores_sintacticos << "La función #{@ident.nombre} no puede tener una instrucción de retorno"
+		if @argumentos != []
+			@argumentos.conseguir_decl(tabla)
 		end
-		@instruccionesfu.fill_table(tabla)
+		if @instruccionesfu.respond_to? :buscarRetorno
+			if @instruccionesfu.buscarRetorno == true
+				$lista_errores_sintacticos << "La función #{@ident.nombre} no puede tener una instrucción de retorno"
+			end
+		end
+		@instruccionesfu.fill_table(tabla) if @instruccionesfu.respond_to? :fill_table
 	end
 end
 
@@ -165,11 +179,18 @@ class FuncionConTipo
 			$lista_errores_sintacticos << "Una función no puede ser declarada si tiene el mismo nombre de una declarada anteriormente (linea #{@ident.token.line})"
 		end
 		tabla = TablaSimbolos.new("Funcion", "#{@ident.nombre}", padre, "#{@tipo.nombre}", @argumentos)
-		@argumentos.conseguir_decl(tabla)
-		if @instruccionesfu.buscarRetorno == false
+		if @argumentos != []
+			@argumentos.conseguir_decl(tabla)
+		end
+		if @instruccionesfu.respond_to? :buscarRetorno
+			if @instruccionesfu.buscarRetorno == false
+				$lista_errores_sintacticos << "La función #{@ident.nombre} debe tener una instrucción de retorno"
+			end
+		else
 			$lista_errores_sintacticos << "La función #{@ident.nombre} debe tener una instrucción de retorno"
 		end
-		@instruccionesfu.fill_table(tabla)
+		
+		@instruccionesfu.fill_table(tabla) if @instruccionesfu.respond_to? :fill_table
 	end
 end
 
@@ -192,7 +213,7 @@ class IterFor
 	def fill_table padre = $tabla_de_tablas
 		tabla = TablaSimbolos.new("Iteracion for", "For", padre)
 		tabla.insertar(@ident.token, "number")
-		@instruccion.fill_table(tabla)
+		@instruccion.fill_table(tabla) if @instruccion.respond_to? :fill_table
 	end
 end
 
@@ -200,6 +221,6 @@ class IterForBy
 	def fill_table padre = $tabla_de_tablas
 		tabla = TablaSimbolos.new("Iteracion for", "For", padre)
 		tabla.insertar(@ident.token, "number")
-		@instruccion.fill_table(tabla)
+		@instruccion.fill_table(tabla) if @instruccion.respond_to? :fill_table
 	end
 end

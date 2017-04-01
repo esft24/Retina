@@ -43,7 +43,7 @@ class Funcion < AST
 end
 
 class FuncionConTipo < AST
-	attr_accessor :ident, :argumentos, :instruccionesfu
+	attr_accessor :ident, :argumentos, :instruccionesfu, :tipo
 	def initialize i, a, t, ifu
 		@ident = i						#Identificador 
 		@argumentos = a			#Listas>Argumentos o []
@@ -108,15 +108,16 @@ class Funciones < Listas; end		#Funcion
 class Argumentos < Listas; end		#Argumento
 class Declaraciones < Listas; end	#Declaracion
 class Instrucciones < Listas; end	#Instruccion (*)
-class Salidas < Listas; end				#Expresion(*) o CadenaDeCaracteresParser
-class SalidasConSalto < Listas		#Expresion(*) o CadenaDeCaracteresParser
-	def print_ast indent = ""
-		puts "#{indent}Salidas con Salto"
-		@lista.each do |f|
-			f.print_ast indent + "      " if f.respond_to? :print_ast
+class Salidas < Listas
+	attr_accessor :lista, :salto
+	def initialize a, writeowriteln 
+		@lista = a #Atributo es un arreglo de objetos AST
+		@salto = true
+		if writeowriteln == 'write'
+			@salto = false
 		end
 	end
-end
+end	
 ################################################################################################################
 
 ###############################################Instrucciones varias############################
@@ -171,11 +172,12 @@ class IterWhile < AST
 end
 
 class IterFor < AST
-	def initialize i, d, h, ins
+	def initialize i, d, h, ins, line
 		@ident = i
 		@desde = d
 		@hasta = h
 		@instruccion = ins
+		@line = line
 	end
 	def print_ast indent = ""
 		puts "#{indent}Iterador For"
@@ -191,12 +193,13 @@ class IterFor < AST
 end
 
 class IterForBy < AST
-	def initialize i, d, h, pp, ins
+	def initialize i, d, h, pp, ins, line
 		@ident = i
 		@desde = d
 		@hasta = h
 		@por = pp
 		@instruccion = ins
+		@line = line
 	end
 	def print_ast indent = ""
 		puts "#{indent}Iterador For by"
@@ -214,8 +217,9 @@ class IterForBy < AST
 end
 
 class IterRepeat < AST
-	def initialize v, ins
+	def initialize v, ins, line
 		@veces = v
+		@line = line
 		@instruccion = ins
 	end
 	def print_ast indent = ""
@@ -238,7 +242,11 @@ end
 
 class Entrada < ExpresionUnaria;end
 
-class Retorno < ExpresionUnaria;end
+class Retorno < ExpresionUnaria
+	def run_inst padre
+		padre.encontrar_insertar($stack_funciones[-1].capitalize, @op.encontrar_valor(padre), "number")
+	end
+end
 
 class Minus < ExpresionUnaria
 	attr_accessor :op, :tipo, :checked, :linea

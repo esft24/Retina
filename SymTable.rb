@@ -1,5 +1,9 @@
 require_relative 'SegregateTks'
 
+#Clase que permite asociar varias tablas de hash de manera que estas puedan ser
+#consultadas de manera ascendente para simular así una tabla de datos sintácticos
+#que permitan verificar la correctitud de un programa hecho en Retina antes de su corrida
+
 class TablaSimbolos
 	attr_accessor :indent, :hijo, :retorno, :tabla, :argumentos, :nombre
 	

@@ -86,11 +86,14 @@ class Parser
 
 		Alcance: 'program' Instruccion 'end' ';' 				{result = Programa.new([], Instrucciones.new(val[1]))}
 			  | Funciones 'program' Instruccion 'end' ';'		{result = Programa.new(Funciones.new(val[0]), Instrucciones.new(val[2]))}
+			  | Funciones 'program' 'end' ';'					{result = Programa.new(Funciones.new(val[0]), [])}
 			  | Funciones										{result = Programa.new(Funciones.new(val[0]), [])}
 			  ;
 
 		Bloque: 'with' Declaracion 'do' Instruccion 'end' ';'   {result = Bloque.new(Declaraciones.new(val[1]), Instrucciones.new(val[3]))}
 			  | 'with' 'do' Instruccion 'end' ';'   			{result = Bloque.new([], Instrucciones.new(val[2]))}
+			  | 'with' 'do' 'end' ';'   						{result = Bloque.new([], [])}
+			  | 'with' Declaracion 'do' 'end' ';'   			{result = Bloque.new(Declaraciones.new(val[1]), [])}
 			  ;
 
 		Funciones: Funcion Funciones	{result = [val[0]] + val[1]}
@@ -101,6 +104,10 @@ class Parser
 			   | 'func' 'Ident' '(' Argumento ')' '->' Tipo 'begin' InstruccionFun 'end' ';' 	 {result = FuncionConTipo.new(Identificador.new(val[1]), Argumentos.new(val[3]), val[6], Instrucciones.new(val[8]))}
 			   | 'func' 'Ident' '(' ')' 'begin' InstruccionFun 'end' ';' 				     	 {result = Funcion.new(Identificador.new(val[1]), [], Instrucciones.new(val[5]))}
 			   | 'func' 'Ident' '(' ')' '->' Tipo 'begin' InstruccionFun 'end' ';' 			 	 {result = FuncionConTipo.new(Identificador.new(val[1]), [], val[5], Instrucciones.new(val[7]))}
+			   | 'func' 'Ident' '(' Argumento ')' 'begin' 'end' ';' 			 	 			 {result = Funcion.new(Identificador.new(val[1]), Argumentos.new(val[3]), [])}
+			   | 'func' 'Ident' '(' Argumento ')' '->' Tipo 'begin' 'end' ';' 	 				 {result = FuncionConTipo.new(Identificador.new(val[1]), Argumentos.new(val[3]), val[6], [])}
+			   | 'func' 'Ident' '(' ')' 'begin' 'end' ';' 				     	 				 {result = Funcion.new(Identificador.new(val[1]), [], [])}
+			   | 'func' 'Ident' '(' ')' '->' Tipo 'begin' 'end' ';' 			 	 			 {result = FuncionConTipo.new(Identificador.new(val[1]), [], val[5], [])}
 			   ;
 
 		Argumento: Tipo 'Ident' ',' Argumento {result = [Argumento.new(val[0], Identificador.new(val[1]))] + val[3]}
@@ -123,11 +130,11 @@ class Parser
 				   | InstrFun 					{result = [val[0]]}
 				   ;
 						
-		InstrF: Bloque					  {result = val[0]}
-			  | IO 						  {result = val[0]}
-			  | Condicional				  {result = val[0]}
-			  | Iteracion				  {result = val[0]}
-			  | Llamada ';'				  {result = val[0]}
+		InstrF: Bloque					  	{result = val[0]}
+			  | IO 						  	{result = val[0]}
+			  | Condicional				  	{result = val[0]}
+			  | Iteracion				  	{result = val[0]}
+			  | Llamada ';'				  	{result = val[0]}
 			  | 'Ident' '=' Expresion ';' 	{result = AsignacionParser.new(Identificador.new(val[0]), val[2])}
 			  ;
 		
@@ -141,8 +148,9 @@ class Parser
 			  ;
 		
 		BloqueFun: 'with' Declaracion 'do' InstruccionFun 'end' ';'   	{result = Bloque.new(Declaraciones.new(val[1]), Instrucciones.new(val[3]))}
-			  | 'do' InstruccionFun 'end' ';' 							{result = Bloque.new([], Instrucciones.new(val[1]))}
 			  | 'with' 'do' InstruccionFun 'end' ';'   					{result = Bloque.new([], Instrucciones.new(val[2]))}
+			  | 'with' 'do' 'end' ';'   								{result = Bloque.new([], [])}
+			  | 'with' Declaracion 'do' 'end' ';'   					{result = Bloque.new(Declaraciones.new(val[1]), [])}
 			  ;
 
 		DeclaF: Tipo 'Ident' ';'		  		{result = Declaracion.new(val[0], Identificador.new(val[1]))}
@@ -150,28 +158,45 @@ class Parser
 			  ;
 
 		IO: 'read' 'Ident' ';'	{result = Entrada.new(Identificador.new(val[1]))}
-		  |	'write' Salida		{result = Salidas.new(val[1])}
-		  | 'writeln' Salida 	{result = SalidasConSalto.new(val[1])}
+		  |	'write' Salida		{result = Salidas.new(val[1], val[0].text)}
+		  | 'writeln' Salida 	{result = Salidas.new(val[1], val[0].text)}
 		  ;
 
 		Condicional: 'if' Expresion 'then' Instruccion 'end' ';'					    {result = CondIf.new(val[1], Instrucciones.new(val[3]), val[0].line)}
 				   | 'if' Expresion 'then' Instruccion 'else' Instruccion 'end' ';' 	{result = CondIfElse.new(val[1], Instrucciones.new(val[3]), Instrucciones.new(val[5]), val[0].line)}
+				   | 'if' Expresion 'then' 'end' ';'					    			{result = CondIf.new(val[1], [], val[0].line)}
+				   | 'if' Expresion 'then' 'else' 'end' ';' 							{result = CondIfElse.new(val[1], [], [], val[0].line)}
+				   | 'if' Expresion 'then' 'else' Instruccion 'end' ';' 				{result = CondIfElse.new(val[1], [], Instrucciones.new(val[4]), val[0].line)}
+				   | 'if' Expresion 'then' Instruccion 'else' 'end' ';' 				{result = CondIfElse.new(val[1], Instrucciones.new(val[3]), [], val[0].line)}
 				   ;
 		
 		CondicionalFun: 'if' Expresion 'then' InstruccionFun 'end' ';'					    {result = CondIf.new(val[1], Instrucciones.new(val[3]), val[0].line)}
 				   | 'if' Expresion 'then' InstruccionFun 'else' InstruccionFun 'end' ';' 	{result = CondIfElse.new(val[1], Instrucciones.new(val[3]), Instrucciones.new(val[5]), val[0].line)}
+				   | 'if' Expresion 'then' 'end' ';'					    				{result = CondIf.new(val[1], [], val[0].line)}
+				   | 'if' Expresion 'then' 'else' 'end' ';' 								{result = CondIfElse.new(val[1], [], [], val[0].line)}
+				   | 'if' Expresion 'then' 'else' InstruccionFun 'end' ';' 					{result = CondIfElse.new(val[1], [], Instrucciones.new(val[4]), val[0].line)}
+				   | 'if' Expresion 'then' InstruccionFun 'else' 'end' ';' 					{result = CondIfElse.new(val[1], Instrucciones.new(val[3]), [], val[0].line)}
 				   ;
 
 		Iteracion: 'while' Expresion 'do' Instruccion 'end' ';' 											{result = IterWhile.new(val[1], Instrucciones.new(val[3]), val[0].line)}
 				 | 'for' 'Ident' 'from' Expresion 'to' Expresion 'do' Instruccion 'end' ';' 				{result = IterFor.new(Identificador.new(val[1]), val[3], val[5], Instrucciones.new(val[7]), val[2].line)}
 				 | 'for' 'Ident' 'from' Expresion 'to' Expresion 'by' Expresion 'do' Instruccion 'end' ';'  {result = IterForBy.new(Identificador.new(val[1]), val[3], val[5], val[7], Instrucciones.new(val[9]), val[2].line)}
 				 | 'repeat' Expresion 'times' Instruccion 'end' ';' 										{result = IterRepeat.new(val[1], Instrucciones.new(val[3]), val[0].line)}
+				 | 'while' Expresion 'do' 'end' ';' 														{result = IterWhile.new(val[1], [], val[0].line)}
+				 | 'for' 'Ident' 'from' Expresion 'to' Expresion 'do' 'end' ';' 							{result = IterFor.new(Identificador.new(val[1]), val[3], val[5], [], val[2].line)}
+				 | 'for' 'Ident' 'from' Expresion 'to' Expresion 'by' Expresion 'do' 'end' ';'  			{result = IterForBy.new(Identificador.new(val[1]), val[3], val[5], val[7], [], val[2].line)}
+				 | 'repeat' Expresion 'times' 'end' ';' 													{result = IterRepeat.new(val[1], [], val[0].line)}
 				 ;
 		
 		IteracionFun: 'while' Expresion 'do' InstruccionFun 'end' ';' 											{result = IterWhile.new(val[1], Instrucciones.new(val[3]), val[0].line)}
 				 | 'for' 'Ident' 'from' Expresion 'to' Expresion 'do' InstruccionFun 'end' ';' 					{result = IterFor.new(Identificador.new(val[1]), val[3], val[5], Instrucciones.new(val[7]), val[2].line)}
 				 | 'for' 'Ident' 'from' Expresion 'to' Expresion 'by' Expresion 'do' InstruccionFun 'end' ';'  	{result = IterForBy.new(Identificador.new(val[1]), val[3], val[5], val[7], Instrucciones.new(val[9]), val[2].line)}
 				 | 'repeat' Expresion 'times' InstruccionFun 'end' ';' 											{result = IterRepeat.new(val[1], Instrucciones.new(val[3]), val[0].line)}
+				 | 'while' Expresion 'do' 'end' ';' 															{result = IterWhile.new(val[1], [], val[0].line)}
+				 | 'for' 'Ident' 'from' Expresion 'to' Expresion 'do' 'end' ';' 								{result = IterFor.new(Identificador.new(val[1]), val[3], val[5], [], val[2].line)}
+				 | 'for' 'Ident' 'from' Expresion 'to' Expresion 'by' Expresion 'do' 'end' ';'  				{result = IterForBy.new(Identificador.new(val[1]), val[3], val[5], val[7], [], val[2].line)}
+				 | 'repeat' Expresion 'times' 'end' ';' 														{result = IterRepeat.new(val[1], [], val[0].line)}
+				 ;
 				 ;
 
 		Llamada: 'Ident' '(' ')'				{result = Llamada.new(Identificador.new(val[0]), [])}
@@ -234,6 +259,10 @@ end
 ---- inner ----
 	def on_error(id, token, stack)
 	  puts "Error Sintáctico"
+	  if token == false
+	  	puts "token inesperado"
+		return
+	  end
       puts token.unexpected
     end
 
