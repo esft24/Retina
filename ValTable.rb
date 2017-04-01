@@ -1,3 +1,8 @@
+#Clase que permite asociar varias tablas de hash de manera que estas puedan ser
+#consultadas de manera ascendente para simular así una tabla de valores
+#que permitan verificar la los datos de las distintas variables de un programa de
+#Retina durante su corrida.
+
 class TablaValores
 	attr_accessor :tabla, :hijo, :nombre, :padre, :indent
 	def initialize nombre, padre = nil

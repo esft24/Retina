@@ -1,5 +1,7 @@
 require_relative 'Ast_fill_table.rb'
 
+#Funciones base de Retina.
+
 dummytoken = TipoNumero.new("number", 0, 0)
 dummytype = Tipo.new(dummytoken)
 dummynumber = Argumento.new(dummytype, [])
@@ -25,4 +27,3 @@ $basefunc = {
 	'setposition'	=> lambda {|a, b| $retina.setposition(a, b)},
 	'arc'			=> lambda {|a, b| $retina.arc(a, b)}
 }
-

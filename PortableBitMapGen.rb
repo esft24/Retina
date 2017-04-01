@@ -1,3 +1,6 @@
+#Objetos que permiten correr un programa tal que por medio de metodos de programacion
+# de tipo turtle graphics creen una imagen en formato pbm.
+
 class Turtle
 	include Math
 	DEG = Math::PI / 180.0

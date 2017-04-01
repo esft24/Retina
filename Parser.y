@@ -259,6 +259,10 @@ end
 ---- inner ----
 	def on_error(id, token, stack)
 	  puts "Error Sintáctico"
+	  if token == false
+	  	puts "token inesperado"
+		return
+	  end
       puts token.unexpected
     end
 

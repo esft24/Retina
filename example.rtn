@@ -1,12 +1,12 @@
-func circle(number radio)
+func hola()
 begin
-    #arc(360, radio);
-	radio = 2;
-	writeln radio;
 end;
 
 program
     write "Insert a number : ";
+	
+	for i from
+	
     with
         number n;
     do
@@ -16,14 +16,10 @@ program
         do
             while angle <= 360 do
                 #rotater(n);
-                circle(100);
+                hola();
+				write "holo";
                 angle = angle + n;
             end;
         end;
     end;
 end;
-
-
-
-
-

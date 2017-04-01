@@ -1,3 +1,5 @@
+#Métodos que permiten buscar el valor de una expresión
+
 class ExpresionBinaria
 	def encontrar_valor padre
 		return run_inst(padre)
@@ -73,7 +75,6 @@ class Resta
 	def run_inst padre
 		iz = @izquierda.encontrar_valor(padre)
 		de = @derecha.encontrar_valor(padre)
-		
 		return (iz - de)
 	end
 end
@@ -228,4 +229,12 @@ class Negacion
 		
 		return (!val)
 	end
+end
+
+# 
+
+class Fixnum
+  def num_digits
+    Math.log10(self).to_i + 1
+  end
 end
