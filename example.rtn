@@ -1,6 +1,6 @@
 func circle(number radio)
 begin
-    arc(360, radio);
+    #arc(360, radio);
 	radio = 2;
 	writeln radio;
 end;
@@ -15,7 +15,7 @@ program
             number angle = n;
         do
             while angle <= 360 do
-                rotater(n);
+                #rotater(n);
                 circle(100);
                 angle = angle + n;
             end;
