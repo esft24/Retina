@@ -25,6 +25,10 @@ class Parser < Racc::Parser
 module_eval(<<'...end Parser.y/module_eval...', 'Parser.y', 260)
 	def on_error(id, token, stack)
 	  puts "Error Sintáctico"
+	  if token == false
+	  	puts "token inesperado"
+		return
+	  end
       puts token.unexpected
     end
 
@@ -1085,14 +1089,14 @@ module_eval(<<'.,.,', 'Parser.y', 159)
 
 module_eval(<<'.,.,', 'Parser.y', 160)
   def _reduce_50(val, _values, result)
-    result = Salidas.new(val[1], false)
+    result = Salidas.new(val[1], val[0].text)
     result
   end
 .,.,
 
 module_eval(<<'.,.,', 'Parser.y', 161)
   def _reduce_51(val, _values, result)
-    result = Salidas.new(val[1], true)
+    result = Salidas.new(val[1], val[0].text)
     result
   end
 .,.,

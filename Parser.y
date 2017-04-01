@@ -158,8 +158,8 @@ class Parser
 			  ;
 
 		IO: 'read' 'Ident' ';'	{result = Entrada.new(Identificador.new(val[1]))}
-		  |	'write' Salida		{result = Salidas.new(val[1], false)}
-		  | 'writeln' Salida 	{result = Salidas.new(val[1], true)}
+		  |	'write' Salida		{result = Salidas.new(val[1], val[0].text)}
+		  | 'writeln' Salida 	{result = Salidas.new(val[1], val[0].text)}
 		  ;
 
 		Condicional: 'if' Expresion 'then' Instruccion 'end' ';'					    {result = CondIf.new(val[1], Instrucciones.new(val[3]), val[0].line)}

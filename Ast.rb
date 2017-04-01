@@ -110,12 +110,12 @@ class Declaraciones < Listas; end	#Declaracion
 class Instrucciones < Listas; end	#Instruccion (*)
 class Salidas < Listas
 	attr_accessor :lista, :salto
-	def initialize a, salto #, writeowriteln 
+	def initialize a, writeowriteln 
 		@lista = a #Atributo es un arreglo de objetos AST
 		@salto = true
-		#if writeowriteln == 'write'
-		#	@salto = false
-		#end
+		if writeowriteln == 'write'
+			@salto = false
+		end
 	end
 end	
 ################################################################################################################
